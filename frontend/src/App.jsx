@@ -1,7 +1,7 @@
 import React from "react"
 import {BrowserRouter,Link, Route,Routes} from 'react-router-dom'
 import {logo} from "./description"
-import { Landing } from "./pages"
+import { Landing, Signup } from "./pages"
 
 function App() {
 
@@ -21,6 +21,7 @@ function App() {
       <main className="sm:p-8 px-4 py-8 bg-[#4A4D6D]  min-h-[calc(100vh-73px)]">
         <Routes>
         <Route path='/' element={<Landing></Landing>}></Route>
+        <Route path="/signup" element={<Signup></Signup>}></Route>
         </Routes>
 
       

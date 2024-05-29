@@ -5,7 +5,7 @@ import { HoverSVG } from "../components"
 const Login = () =>{
     return(
         <div className=" w-1/2 bg-[#DBF4A7] hover:bg-[#C5DB96] flex justify-center rounded-lg">
-            <Link to='/singup' className="text-center justify-items-center">
+            <Link to='/signup' className="text-center justify-items-center">
                 <p className="p-4 text-center font-semibold text-lg text-[#4A4D6D]">TURN GOALS TO VICTORIES</p>
             </Link>
         </div>
