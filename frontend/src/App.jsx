@@ -1,7 +1,7 @@
 import React from "react"
 import {BrowserRouter,Link, Route,Routes} from 'react-router-dom'
 import {logo} from "./description"
-import { Landing, Signup } from "./pages"
+import { Landing, Signin, Signup } from "./pages"
 
 function App() {
 
@@ -22,6 +22,7 @@ function App() {
         <Routes>
         <Route path='/' element={<Landing></Landing>}></Route>
         <Route path="/signup" element={<Signup></Signup>}></Route>
+        <Route path="/signin" element={<Signin></Signin>}></Route>
         </Routes>
 
       
