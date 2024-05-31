@@ -7,17 +7,16 @@ const HoverRenew = () => {
     const [isClicked,setisClicked] = useState(false);
     const [showConfetti,setshowConfetti] = useState(false);
     const [isClickable,setisClickable] = useState(true);
-
+    
     useEffect(() => {
         const lastClickedDate = localStorage.getItem('lastClickedDate');
         const today = new Date().toDateString();
-        if (lastClickedDate !== today){
-            localStorage.setItem('lastClickedDate',today);
+        if (lastClickedDate != today){
             setisClickable(true);
             console.log(lastClickedDate)
-        }else{
+        }if (lastClickedDate == today) {
             setisClickable(false);
-        }
+        } 
     }, []);
 
     const handleClick =() => {
@@ -34,12 +33,12 @@ const HoverRenew = () => {
             const lastClickedDate = localStorage.getItem('lastClickedDate');
             const today  = new Date().toDateString();
 
-            if(lastClickedDate !== today){
-                localStorage.setItem('lastClickedDate', today);
+            if(lastClickedDate != today){
                 setisClickable(true);
             }
             console.log('check')
-        },60000);
+            console.log(today,lastClickedDate)
+        },1000);
         return() => clearInterval(intervalId);
 
     },[])
