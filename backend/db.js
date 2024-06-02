@@ -46,6 +46,11 @@ userSchema.methods.validatePassword = async function (candidatePassword) {
   return await argon2.verify(this.password_hash, candidatePassword)
 };
 
+const datecompleteSchema  = new mongoose.Schema({
+    id : String,
+    completed_days : Number
+})
+
 const goalSchema = new mongoose.Schema({
     userId : {
         type : String,
@@ -63,19 +68,18 @@ const goalSchema = new mongoose.Schema({
         trim : true,
     },
     goalStart : {
-        type : String,
+        type : Date,
         required : true,
         trim : true
     },
     goalEnd : {
-        type : String,
+        type : Date,
         required : false,
-        trim : true
+        trim : true,
+        default : 'Present'
     },
-    datecompleted:{
-        type : String,
-        default : '0',
-    },
+    datecompleted:[datecompleteSchema],
+    
     friends_id : [{
         type : Array,
         required : true,

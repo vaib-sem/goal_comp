@@ -3,6 +3,8 @@ const {Goal , User} = require("../db")
 const { authMiddleware } = require("../middleware")
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 const creategoalbody = zod.object({
     goalName : zod.string(),
@@ -26,6 +28,12 @@ router.post('/creategoal',authMiddleware, async(req,res) =>{
         goalDescription : req.body.goalDescription,
         goalStart : req.body.goalStart,
         goalEnd : req.body.goalEnd,
+        // date completed is added with reference to the id the completed_days belongs
+        datecompleted : [{
+            id  : req.userId,
+            completed_days : 0
+
+        }]
 })
 
     await newgoal.save();
@@ -42,8 +50,8 @@ router.post('/creategoal',authMiddleware, async(req,res) =>{
 const updategoalbody = zod.object({
     goalName : zod.string().optional(),
     goalDescription : zod.string().optional(),
-    goalStart : zod.string().optional(),
-    goalEnd : zod.string().optional(),
+    goalStart : zod.date().optional(),
+    goalEnd : zod.date().optional(),
     goalId : zod.string(),
 })
 
@@ -68,13 +76,56 @@ router.post('/updategoal',authMiddleware, async(req,res) => {
     }
 })
 
-const goal_completebody = zod.object({
+
+router.get('/bulk', async (req, res) => {
+    const id = req.query.id; 
+    console.log('Recieved id', id.id)
+    if (!id ) {
+        return res.status(400).json({ error: "Invalid or missing id" });
+    }
+
+    try {
+        const goal = await Goal.findById((id.id));;
+        console.log('Goal found:', goal);
+        if (!goal) {
+            console.error('goal not found')
+            return res.status(404).json({ error: "Goal not found" });
+        }
+
+        res.json({
+            goalName: goal.goalName,
+            goalDescription: goal.goalDescription,
+            goalStart: goal.goalStart,
+            goalEnd: goal.goalEnd,
+            datecompleted: goal.datecompleted,
+            friends_id: goal.friends_id
+        });
+    } catch (error) {
+        console.error('Error fetching goal:', error);
+        res.status(500).json({ error: "Internal Server Error in backend" });
+    }
+
+});
+
+
+goal_completebody = zod.object({
     goalId : zod.string(),
     marked_unmarked : zod.string(),
 })
 // task complete mark 
 router.post('/complete-goal',authMiddleware, async (req,res) =>{
     const {success} = goal_completebody.safeParse(req.body);
+    const filter = (object,id) =>{
+        var filtered = [];
+        var toSearch = id;
+        for(var i = 0; i< object.lenght;i++){
+            for(key in object[i]){
+                if(object[i][key].indexOf(toSearch) != toSearch){
+                    filtered.push(object[i]);
+                }
+            }
+        }
+    }
     if(!success){
         return res.status(411).json({
             message : "Wrong input"
@@ -85,14 +136,18 @@ router.post('/complete-goal',authMiddleware, async (req,res) =>{
 
     const incValue = Number(req.body.marked_unmarked);
     try{
-        const updateResult = await Goal.findOneAndUpdate(
+        // identifier used to find the id of the user in datecompleted and $inc to inc the value of completed_days by 1
+        const update_date_goal = await Goal.findOneAndUpdate(
             { _id: req.body.goalId },
-            { $inc: { datecompleted: incValue } })
-        if (!updateResult) {
+            {$inc : {"datecompleted.$[element].complted_days" : req.marked_unmarked}},
+            {arrayFilters : [{"element.id":{$eq : req.userId}}]})
+        
+            if (!update_date_goal) {
                 return res.status(404).json({
                     message: "Goal not found"
                 });
             }
+        
 
         res.status(201).json({
             message: "Task completed successfully",
@@ -190,6 +245,11 @@ router.post('/Addfriend',authMiddleware,async(req,res) => {
         // add friend id in the goal schema as the user parameter will already set for the user that created the goal 
         goal_add.friends_id.push(req.body.user_friendId);
 
+        goal_add.datecompleted.push({
+            id : req.body.user_friendId,
+            completed_days : 0
+        })
+
         await friend_add.save();
         await goal_add.save();
         return res.status(201).json({
@@ -211,6 +271,18 @@ const deletefriendbody = zod.object({
 
 router.post('/deletefriend',authMiddleware, async(req,res) =>{
     const {success} = deletefriendbody.safeParse(req.body)
+
+    const filter = (object) => {
+        var filtered = [];
+        for(let i = 0; i<object.lenght ; i++){
+            if(object[i].id != req.body.user_friendId){
+                filtered.push(object[i]);
+            }
+        }
+        return filtered;
+
+    }
+
     if(!success){
         res.status(411).json({
             message : "Unable to delete a friend"
@@ -232,6 +304,7 @@ router.post('/deletefriend',authMiddleware, async(req,res) =>{
         }
         // removing the friends id from the friends id in the goal model
         goal_delete.friends_id = goal_delete.friends_id[0].filter(id => id !== req.body.user_friendId);
+        goal_delete.datecompleted = filter(goal_delete.datecompleted);
         // removing the goal id from the friends goal list
         friend_delete.goal_list_id = friend_delete.goal_list_id[0].filter(id => id !== req.body.goalId);
         console.log("Before friend deletion:", friend_delete);
