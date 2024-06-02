@@ -1,31 +1,52 @@
 import React,{useState,useEffect} from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { tick } from "../description";
+import GoalWithId from "./recoil";
+import {useRecoilState } from 'recoil';
+import axios from "axios";
+import PropTypes from 'prop-types';
 
-const HoverRenew = () => {
+const HoverRenew = ({id}) => {
     const [isHovering,setisHovering] = useState(false);
     const [isClicked,setisClicked] = useState(false);
     const [showConfetti,setshowConfetti] = useState(false);
-    const [isClickable,setisClickable] = useState(true);
-    
+    const [goalList,setgoalList] = useRecoilState(GoalWithId((id))); 
+    const [isClickable,setisClickable] = useState(false);
+
     useEffect(() => {
         const lastClickedDate = localStorage.getItem('lastClickedDate');
         const today = new Date().toDateString();
         if (lastClickedDate != today){
             setisClickable(true);
-            console.log(lastClickedDate)
         }if (lastClickedDate == today) {
             setisClickable(false);
         } 
     }, []);
 
     const handleClick =() => {
-        setisClicked(true);
-        setshowConfetti(true);
-        const now = new Date();
-        localStorage.setItem('lastClickedDate', now.toDateString()); //stores the date the button was clicked
-        setisClickable(false)
-        //add the funtionality to inc the datecompleted in the card
+        axios.post('http://localhost:3000/api/v1/goal/complete-goal',
+            {   goalId : id,
+                marked_unmarked : 1,})
+            .then(res => {
+                let text = res.data.message;
+                if(text == 'Goal not found'|| text == "Problem in marking complete task"){
+                    alert("Unable to update the Goal")
+                }else{
+                    //implies that if the post request is successfull only then will the tick appear
+                    setisClicked(true);
+                    setshowConfetti(true);
+                    const now = new Date();
+                    localStorage.setItem('lastClickedDate', now.toDateString()); //stores the date the button was clicked
+                    setisClickable(false)
+                
+                    setgoalList(prev => ({
+                        ...prev,
+                        dateCompleted : prev.dateCompleted + 1 }))
+                }
+
+            })
+            
+      
     }
 
     useEffect(() => {
@@ -36,9 +57,7 @@ const HoverRenew = () => {
             if(lastClickedDate != today){
                 setisClickable(true);
             }
-            console.log('check')
-            console.log(today,lastClickedDate)
-        },1000);
+        },60000);
         return() => clearInterval(intervalId);
 
     },[])
@@ -50,8 +69,6 @@ const HoverRenew = () => {
     const handleMouseleave= () => {
         setisHovering(false);
     }
-
-    
 
     const confetticomplete =() => {
         setshowConfetti(false);
@@ -70,5 +87,9 @@ const HoverRenew = () => {
         </div>
     )
 }
+
+HoverRenew.propTypes = {
+    id: PropTypes.string.isRequired,
+};
 
 export default HoverRenew;

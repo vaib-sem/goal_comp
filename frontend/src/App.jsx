@@ -1,11 +1,18 @@
 import React from "react"
 import {BrowserRouter,Link, Route,Routes} from 'react-router-dom'
 import {logo} from "./description"
-import { Landing, Signin, Signup } from "./pages"
-
+import { Dashboar, Landing, Signin, Signup } from "./pages"
+import {
+  RecoilRoot,
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+} from 'recoil';
 function App() {
 
   return (
+    <RecoilRoot>
     <BrowserRouter>
     <header className="w-full flex justify-center bg-[#4A4D6D] sm:px-8 px-4 py-4 border-b border-b-[#4A4D6D]">
       <Link to= '/' className="flex w-1/2 justify-center items-center">
@@ -23,11 +30,15 @@ function App() {
         <Route path='/' element={<Landing></Landing>}></Route>
         <Route path="/signup" element={<Signup></Signup>}></Route>
         <Route path="/signin" element={<Signin></Signin>}></Route>
+        <Route path="/dashboard" element={<Dashboar></Dashboar>}></Route>
+
         </Routes>
 
       
       </main>
     </BrowserRouter>
+    </RecoilRoot>
+
   )
 }
 

@@ -1,12 +1,12 @@
 import React,{useState} from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { tick } from "../description";
-import ReactConfetti from "react-confetti";
 
 const HoverSVG = () => {
     const [isHovering,setisHovering] = useState(false);
     const [isClicked,setisClicked] = useState(false);
     const [showConfetti,setshowConfetti] = useState(false);
+    
 
     const handleMouseenter = () => {
         setisHovering(true);
