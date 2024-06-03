@@ -7,8 +7,10 @@ import {
     useRecoilState,
     useRecoilValue,
   } from 'recoil';
+
 //define state and update the element on the basis of the chage in props
 //props would be 
+console.log('d');
 const GoalCard = (id) => {
     const [goalState,setgoalState] = useRecoilState(GoalWithId(id));
     const {goalName ,
@@ -17,8 +19,10 @@ const GoalCard = (id) => {
         goalEnd ,
         datecompleted,
         friends_id } = goalState
-        console.log('start')
+        
+
     useEffect(() =>{
+        console.log('a')
        axios.get('http://localhost:3000/api/v1/goal/bulk', {params: {id}})
        .then(res => {
         const { goalName, goalDescription, goalStart, goalEnd, datecompleted, friends_id } = res.data;
@@ -40,15 +44,26 @@ const GoalCard = (id) => {
    
 
 
+    var filtered = [];
+    var toSearch = id;
+    for(var i = 0; i< datecompleted.lenght;i++){
+        for(key in object[i]){
+            if(object[i][key].indexOf(toSearch) != toSearch){
+                filtered.push(object[i]);
+            }
+        }
+    }
+    const datecompleted_number = datecompleted?.[0]?.completed_days || 0;
+
     const Datemissed = (goalStart) => {
         const date1 = new Date(goalStart);
         let currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - 1);
+        currentDate.setDate(currentDate.getDate());
         console.log(date1);
         console.log(currentDate);
         let differnece  = currentDate.getTime() - date1.getTime();
         let Difference_In_Days =
-        Math.round(differnece/ (1000 * 3600 * 24));
+        Math.round(differnece/ (1000 * 3600 * 24)) - datecompleted_number;
         return isNaN(Difference_In_Days) ? 0 : Difference_In_Days;
         }
 
@@ -87,7 +102,7 @@ const GoalCard = (id) => {
                             <p className=" text-sm text-center font-semibold text-[#bfdbf7]">GOAL DATES</p>
                         </div>
                         <div className="bg-[#426B69] rounded-lg p-1 flex-1 drop-shadow-lg">
-                            <p className=" text-xs pb-1 min-h-4 text-center font-light text-[#E4ECD5]">{datecompleted}</p>
+                            <p className=" text-xs pb-1 min-h-4 text-center font-light text-[#E4ECD5]">{datecompleted_number}</p>
                             <p className=" text-sm text-center font-semibold text-[#bfdbf7]">COMPLETED </p>
                         </div>
                         <div className="bg-[#426B69] rounded-lg p-1 flex-1  mx-6 drop-shadow-lg">
@@ -97,6 +112,7 @@ const GoalCard = (id) => {
     
                     </div>
                     <div className="px-8 pt-1 ">
+                       
                     </div>
                 </div>
                 

@@ -24,6 +24,7 @@ const HoverRenew = ({id}) => {
     }, []);
 
     const handleClick =() => {
+        console.log('clicked')
         axios.post('http://localhost:3000/api/v1/goal/complete-goal',
             {   goalId : id,
                 marked_unmarked : 1,})

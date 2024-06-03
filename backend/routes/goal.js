@@ -32,7 +32,6 @@ router.post('/creategoal',authMiddleware, async(req,res) =>{
         datecompleted : [{
             id  : req.userId,
             completed_days : 0
-
         }]
 })
 
@@ -115,17 +114,7 @@ goal_completebody = zod.object({
 // task complete mark 
 router.post('/complete-goal',authMiddleware, async (req,res) =>{
     const {success} = goal_completebody.safeParse(req.body);
-    const filter = (object,id) =>{
-        var filtered = [];
-        var toSearch = id;
-        for(var i = 0; i< object.lenght;i++){
-            for(key in object[i]){
-                if(object[i][key].indexOf(toSearch) != toSearch){
-                    filtered.push(object[i]);
-                }
-            }
-        }
-    }
+    
     if(!success){
         return res.status(411).json({
             message : "Wrong input"

@@ -158,5 +158,35 @@ router.get('/bulk', async (req,res) =>{
 
 })
 
+router.get('/names',async(req,res)=>{
+    const ids = req.body;
+    let name = []
+    try{
+        const user_list = await Promise.all(ids.map(id => User.findOne({_id : id})))
+        for(let i =0;i<user_list.length;i++){
+            const user = user_list[i];
+            if(!user){
+               return res.status(411).json({
+                    message : "User with id ${ids[i]} doesn't exist"
+                })
+            }
+            name.push(user.firstName + " " + user.lastName)
+        }
+        res.status(200).json({
+            name
+        });
+    }catch{
+        res.status(500).json({
+            message: "Error fetching user data",
+            error: error.message
+        });
+    }
+    
+ 
+    })
+
+    
+    
+
 
 module.exports = router;

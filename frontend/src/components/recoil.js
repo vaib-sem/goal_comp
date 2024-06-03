@@ -14,9 +14,8 @@ const GoalWithId = atomFamily({
       goalDescription: '',
       goalStart: new Date(),
       goalEnd: new Date(),
-      dateCompleted: '', // Fixed typo from datecompleted to dateCompleted
+      datecompleted: '', 
       friends_id: []
     })
   });
-  
 export default GoalWithId;
