@@ -43,20 +43,26 @@ router.post('/signup', async (req,res) => {
     //hashing
     var hashedPassword = await newuser.createHash(req.body.password);
     newuser.password_hash = hashedPassword;
+    try{
+        await newuser.save();
     
-    await newuser.save();
+        const userId = newuser._id;
+        const token = jwt.sign({
+            userId
+            }, JWT_SECRET);
     
-    const userId = newuser._id;
-    const token = jwt.sign({
-        userId
-        }, JWT_SECRET);
-
-    return res.status(201).json({
-        message: "User created successfully",
-        token : token
+        return res.status(201).json({
+            message: "User created successfully",
+            token : token
+            })
+    }catch(error){
+        return res.status(500).json({
+            message: "Error creating user",
+            error: error.message
         })
+   
 
-})
+}})
 
 const signinbody = zod.object({
     username : zod.string(),
