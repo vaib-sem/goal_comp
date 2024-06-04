@@ -72,7 +72,7 @@ const signinbody = zod.object({
 router.post('/signin',async (req,res) => {
     const {success} = signinbody.safeParse(req.body);
     if(!success) {
-        res.status(411).json({
+        return res.status(411).json({
             message : "Incorrect inputs"
         })
     }
@@ -83,10 +83,11 @@ router.post('/signin',async (req,res) => {
    
 
     if(!user){
-        res.status(411).json({
+        return res.status(411).json({
             message  : "User does not exist ,Please signup"
         })
     }else {
+        try{
         if( await argon2.verify(user.password_hash,req.body.password))
         {
             const token = jwt.sign({
@@ -102,6 +103,11 @@ router.post('/signin',async (req,res) => {
             return res.status(400).json({
                 message: "Incorrect Password",
               });
+        }}catch(error){
+            console.error("Error during password verification:", error);
+            return res.status(500).json({
+                message: "Internal server error"
+            });
         }
     }
     

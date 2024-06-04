@@ -1,5 +1,7 @@
-import React,{useState} from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React,{useEffect, useState} from 'react'
+import { Link, resolvePath, useNavigate } from 'react-router-dom'
+import loginvalidation from './validation/loginvalidation'
+import axios from 'axios'
 
 const Signin = () => {
     const navigate = useNavigate()
@@ -7,13 +9,37 @@ const Signin = () => {
         username :'',
         password : '',
     })
+    const [Errors,setErrors] =useState({})
     const HandleInput = ((event)=> {
-        setValues(prev => ({...prev,[event.target.name]:[event.target.value]}))
+        setValues(prev => ({...prev,[event.target.name]:event.target.value}))
         console.log(Values)
     })
+    useEffect(() => {
+        if (Object.keys(Errors).length === 0) { 
+          axios.post('http://localhost:3000/api/v1/user/signin', Values)
+            .then((res) => {
+                console.log(res);
+                let text = res.data.message;
+                if (text === 'Incorrect inputs') {
+                    alert('Incorrect inputs');
+                } else if (text === 'User does not exist ,Please signup') {
+                    alert('User does not exist ,Please signup');
+                } else if (text === 'Incorrect Password') {
+                    alert('Incorrect password');
+                } else if( text === 'Internal server error'){
+                  alert('Internal server error')
+                }else if (text === 'User Successfully Logged In') {
+                  localStorage.setItem("token", res.data.token)
+                  navigate("/dashboard")
+                
+                }
+            
+            })
+        }},[Errors])
     const HandleSubmit = ((events) =>{
         events.preventDefault()
-        navigate('/dashboard')
+        setErrors(loginvalidation(Values));
+        
     })
     
     
