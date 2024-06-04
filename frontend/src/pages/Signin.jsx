@@ -57,9 +57,12 @@ const Signin = () => {
               <form action='POST' onSubmit={HandleSubmit}>
                 <p className='pt-4 pb-2 text-sm text-[#b6b7c4]'>E-mail</p>
                 <input onChange={HandleInput} type='email' placeholder='XYZ@gmail.com' name='username' className='w-full h-[2.2rem] rounded-lg px-4 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'></input>
+                {Errors.username && <p className='text-red-500 text-xs'>{Errors.username}</p>}
+                <br></br>
     
                 <p className='pt-4 pb-2 text-sm text-[#b6b7c4]'>Password</p>
                 <input onChange={HandleInput} type='password' placeholder='Enter Password' name='password' className='w-full h-[2.2rem] rounded-lg px-4 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2 '></input>
+                {Errors.password && <p className='text-red-500 text-xs'>{Errors.password}</p>}
                 <br></br>
     
                 <button type='submit' className=' w-full  rounded-2xl h-[3rem] mt-10 bg-[#DBF4A7] hover:bg-[#C5DB96] text-center font-semibold text-lg text-[#4A4D6D]'>LOGIN</button>
