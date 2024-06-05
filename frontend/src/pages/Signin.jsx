@@ -5,6 +5,8 @@ import axios from 'axios'
 
 const Signin = () => {
     const navigate = useNavigate()
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [Values,setValues] =useState({
         username :'',
         password : '',
@@ -12,13 +14,11 @@ const Signin = () => {
     const [Errors,setErrors] =useState({})
     const HandleInput = ((event)=> {
         setValues(prev => ({...prev,[event.target.name]:event.target.value}))
-        console.log(Values)
     })
     useEffect(() => {
-        if (Object.keys(Errors).length === 0) { 
+        if (Object.keys(Errors).length === 0 && isSubmitting) { 
           axios.post('http://localhost:3000/api/v1/user/signin', Values)
             .then((res) => {
-                console.log(res);
                 let text = res.data.message;
                 if (text === 'Incorrect inputs') {
                     alert('Incorrect inputs');
@@ -29,17 +29,31 @@ const Signin = () => {
                 } else if( text === 'Internal server error'){
                   alert('Internal server error')
                 }else if (text === 'User Successfully Logged In') {
+
                   localStorage.setItem("token", res.data.token)
                   navigate("/dashboard")
                 
                 }
             
-            })
-        }},[Errors])
+            }).catch((err) => {
+              console.error('Error during API call:', err.response ? err.response.data : err.message);
+              if (err.response) {
+                  // Server responded with a status other than 200 range
+                  alert(`Error: ${err.response.data.message}`);
+              } else if (err.request) {
+                  // Request was made but no response received
+                  alert('Error: No response from server.');
+              } else {
+                  // Something happened in setting up the request that triggered an Error
+                  alert(`Error: ${err.message}`);
+              }
+          }).finally(() => setIsSubmitting(false));
+
+        }},[Errors, isSubmitting, Values, navigate])
     const HandleSubmit = ((events) =>{
         events.preventDefault()
         setErrors(loginvalidation(Values));
-        
+        setIsSubmitting(true);
     })
     
     

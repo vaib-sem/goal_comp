@@ -70,46 +70,53 @@ const signinbody = zod.object({
 })
 
 router.post('/signin',async (req,res) => {
-    const {success} = signinbody.safeParse(req.body);
-    if(!success) {
+    const result = signinbody.safeParse(req.body);
+    
+    if(!result.success) {
         return res.status(411).json({
             message : "Incorrect inputs"
         })
     }
-
-    const user =  await User.findOne({
-        username : req.body.username
-    })
-   
-
-    if(!user){
-        return res.status(411).json({
-            message  : "User does not exist ,Please signup"
+    try{
+        const user =  await User.findOne({
+            username : req.body.username
         })
-    }else {
-        try{
-        if( await argon2.verify(user.password_hash,req.body.password))
-        {
-            const token = jwt.sign({
-                userId: user._id
-                }, JWT_SECRET);
-
-            return res.status(200).json({
-                message: "User Successfully Logged In",
-                token : token
+        if(!user){
+            return res.status(411).json({
+                message  : "User does not exist ,Please signup"
             })
-        } else
-        {
-            return res.status(400).json({
-                message: "Incorrect Password",
-              });
-        }}catch(error){
-            console.error("Error during password verification:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
+        }else {
+            try{
+            if( await argon2.verify(user.password_hash,req.body.password))
+            {
+                const token = jwt.sign({
+                    userId: user._id
+                    }, JWT_SECRET);
+    
+                return res.status(200).json({
+                    message: "User Successfully Logged In",
+                    token : token
+                })
+            } else
+            {
+                return res.status(400).json({
+                    message: "Incorrect Password",
+                  });
+            }}catch(error){
+                console.error("Error during password verification:", error);
+                return res.status(500).json({
+                    message: "Internal server error"
+                });
+            }
         }
+    }catch(error){  
+        console.error("Error fetching user data:", error);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
     }
+        
+    
     
 
 
