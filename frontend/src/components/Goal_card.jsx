@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import PropTypes from 'prop-types';
 import HoverRenew from "./hoverRenew";
 import axios from "axios";
@@ -10,9 +10,10 @@ import {
 
 //define state and update the element on the basis of the chage in props
 //props would be 
-console.log('d');
+
 const GoalCard = (id) => {
     const [goalState,setgoalState] = useRecoilState(GoalWithId(id));
+    const [isRendering, setIsRendering] = useState(false);
     const {goalName ,
         goalDescription ,
         goalStart ,
@@ -22,8 +23,7 @@ const GoalCard = (id) => {
         
 
     useEffect(() =>{
-        console.log('a')
-       axios.get('http://localhost:3000/api/v1/goal/bulk', {params: {id}})
+        axios.get('http://localhost:3000/api/v1/goal/bulk', {params: id})
        .then(res => {
         const { goalName, goalDescription, goalStart, goalEnd, datecompleted, friends_id } = res.data;
         setgoalState({
@@ -34,13 +34,20 @@ const GoalCard = (id) => {
             datecompleted,
             friends_id
         });
-
-        console.log(datecompleted)
-        console.log('a')
-       }).catch(error => {
-        console.error("There was an error fetching the goal data!", error);
-      });
-    },[id])
+       }).catch((err) => {
+        console.error('Error during API call:', err.response ? err.response.data : err.message);
+        if (err.response) {
+            // Server responded with a status other than 200 range
+            alert(`Error: ${err.response.data.message}`);
+        } else if (err.request) {
+            // Request was made but no response received
+            alert('Error: No response from server.');
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            alert(`Error: ${err.message}`);
+        }
+    }).finally(() => setIsRendering(false));
+    },[id,isRendering])
    
 
 
@@ -59,8 +66,6 @@ const GoalCard = (id) => {
         const date1 = new Date(goalStart);
         let currentDate = new Date();
         currentDate.setDate(currentDate.getDate());
-        console.log(date1);
-        console.log(currentDate);
         let differnece  = currentDate.getTime() - date1.getTime();
         let Difference_In_Days =
         Math.round(differnece/ (1000 * 3600 * 24)) - datecompleted_number;

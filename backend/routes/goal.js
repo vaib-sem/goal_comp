@@ -78,14 +78,12 @@ router.post('/updategoal',authMiddleware, async(req,res) => {
 
 router.get('/bulk', async (req, res) => {
     const id = req.query.id; 
-    console.log('Recieved id', id.id)
     if (!id ) {
         return res.status(400).json({ error: "Invalid or missing id" });
     }
 
     try {
-        const goal = await Goal.findById((id.id));;
-        console.log('Goal found:', goal);
+        const goal = await Goal.findById((id));;
         if (!goal) {
             console.error('goal not found')
             return res.status(404).json({ error: "Goal not found" });
