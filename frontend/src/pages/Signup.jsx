@@ -5,6 +5,7 @@ import axios from 'axios'
 
 const Signup = () => {
 const navigate = useNavigate()
+const [isSubmitting, setIsSubmitting] = useState(false);
 const [Values,setValues] =useState({
     username :'',
     firstName :'',
@@ -34,14 +35,25 @@ useEffect(() => {
                   navigate('/signin');
               }
           }).catch((err) => {
-              console.log(err);
-          });
+            console.error('Error during API call:', err.response ? err.response.data : err.message);
+            if (err.response) {
+                // Server responded with a status other than 200 range
+                alert(`Error: ${err.response.data.message}`);
+            } else if (err.request) {
+                // Request was made but no response received
+                alert('Error: No response from server.');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                alert(`Error: ${err.message}`);
+            }
+        }).finally(() => setIsSubmitting(false));
   }
-}, [Errors]);
+}, [Errors,isSubmitting]);
 
 const HandleSubmit = (event) => {
   event.preventDefault();
   setErrors(registerValidation(Values));
+  setIsSubmitting(true);
 };
 
 
