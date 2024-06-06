@@ -7,6 +7,7 @@ import {
     useRecoilState,
     useRecoilValue,
   } from 'recoil';
+import Table from "./Table";
 
 //define state and update the element on the basis of the chage in props
 //props would be 
@@ -86,8 +87,8 @@ const GoalCard = (id) => {
 
     return( 
     
-            <div className="w-1/2 max-w-lg">
-                <div className=" h-full bg-[#774C60] rounded-2xl drop-shadow-2xl">
+            <div className="w-1/2 max-w-lg mb-4">
+                <div className=" h-full bg-[#774C60] rounded-2xl drop-shadow-2xl ">
                     <div className="flex mt-4  justify-between ">
                         <div className="pt-5 px-6 flex ">
                             <p className="pt-2 pl-4 text-center font-bold text-2xl text-[#B78FA2]">{goalName}</p>
@@ -116,8 +117,8 @@ const GoalCard = (id) => {
                         </div> 
     
                     </div>
-                    <div className="px-8 pt-1 ">
-                       
+                    <div className="px-8 pt-1 mt-4 mb-8 ">
+                       <Table friends={datecompleted}></Table>
                     </div>
                 </div>
                 

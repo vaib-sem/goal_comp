@@ -177,8 +177,9 @@ router.get('/bulk', async (req,res) =>{
 
 })
 
-router.get('/names',async(req,res)=>{
+router.post('/names',async(req,res)=>{
     const ids = req.body;
+
     let name = []
     try{
         const user_list = await Promise.all(ids.map(id => User.findOne({_id : id})))
@@ -196,8 +197,7 @@ router.get('/names',async(req,res)=>{
         });
     }catch{
         res.status(500).json({
-            message: "Error fetching user data",
-            error: error.message
+            message: "Error fetching user data"
         });
     }
     
