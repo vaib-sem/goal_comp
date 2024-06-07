@@ -25,7 +25,7 @@ function App() {
         </div>
       </Link>
       </header>
-      <main className="sm:p-8 px-4 py-8 bg-[#4A4D6D]  min-h-[calc(100vh-73px)]">
+      <main className="sm:p-8 px-4 py-8 bg-[#4A4D6D]  h-screen ">
         <Routes>
         <Route path='/' element={<Landing></Landing>}></Route>
         <Route path="/signup" element={<Signup></Signup>}></Route>
