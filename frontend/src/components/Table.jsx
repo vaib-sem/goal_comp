@@ -38,7 +38,7 @@ console.log(friendsWithNames);
 
 
 return (
-    <div class="relative overflow-x-auto rounded-lg mb-4">
+    <div class="relative overflow-x-auto rounded-lg mb-2">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mb-4">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-600 dark:text-gray-400 ">
                 <tr>

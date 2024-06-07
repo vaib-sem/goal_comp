@@ -8,6 +8,7 @@ import {
     useRecoilValue,
   } from 'recoil';
 import Table from "./Table";
+import PopupForm from "./PopUpForm";
 
 //define state and update the element on the basis of the chage in props
 //props would be 
@@ -15,6 +16,7 @@ import Table from "./Table";
 const GoalCard = (id) => {
     const [goalState,setgoalState] = useRecoilState(GoalWithId(id));
     const [isRendering, setIsRendering] = useState(false);
+    
     const {goalName ,
         goalDescription ,
         goalStart ,
@@ -84,6 +86,38 @@ const GoalCard = (id) => {
     if (!goalName || !goalDescription || !goalStart || !goalEnd) {
         return <p>Loading...</p>;
     }
+    const PopupButton = () => {
+        const [showPopup, setShowPopup] = useState(false);
+
+        const handleUpdateButtonClick = () => {
+            setShowPopup(true);
+          };
+        
+          const handleClosePopup = () => {
+            setShowPopup(false);
+          };
+        
+        return (
+            <div>
+            <button
+                onClick={handleUpdateButtonClick} disabled = {showPopup} 
+                className="bg-[#426B69] rounded-lg mb-4 flex-1 mx-6 drop-shadow-lg">
+
+                <p className=" text-xs p-3  min-h-6 text-center font-light text-[#E4ECD5]">UPDATE</p>
+            </button>
+            {showPopup && 
+            (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="absolute rounded-2xl  inset-0 bg-black opacity-50"></div>
+                <div className=" z-20 w-2/3 h-3/4 bg-[#5c5e7b] pt-1 rounded-lg shadow-lg">
+              <PopupForm onClose={handleClosePopup} id = {id} />
+            </div>
+          </div>
+             
+        )}
+        </div>
+        );
+    }
 
     return( 
     
@@ -117,8 +151,11 @@ const GoalCard = (id) => {
                         </div> 
     
                     </div>
-                    <div className="px-8 pt-1 mt-4 mb-8 ">
+                    <div className="px-8 pt-1 mt-4  ">
                        <Table friends={datecompleted}></Table>
+                    </div>
+                    <div className="flex justify-center mb-2">
+                        <PopupButton></PopupButton> 
                     </div>
                 </div>
                 
