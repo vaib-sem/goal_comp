@@ -5,7 +5,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
-
+const cors = require('cors');
+router.use(cors());
 const creategoalbody = zod.object({
     goalName : zod.string(),
     goalDescription : zod.string(),
@@ -49,22 +50,32 @@ router.post('/creategoal',authMiddleware, async(req,res) =>{
 const updategoalbody = zod.object({
     goalName : zod.string().optional(),
     goalDescription : zod.string().optional(),
-    goalStart : zod.date().optional(),
-    goalEnd : zod.date().optional(),
+    goalStart: zod.string().optional().transform(val => val ? new Date(val) : undefined),
+    goalEnd: zod.string().optional().transform(val => val ? new Date(val) : undefined),
     goalId : zod.string(),
 })
 
 // update goal
 router.post('/updategoal',authMiddleware, async(req,res) => {
-    const {success} = updategoalbody.safeParse(req.body)
-    if(!success){
+    const parseResult= updategoalbody.safeParse(req.body)
+    console.log(parseResult)
+    if(!parseResult.success){
+        console.log("Validation errors:", parseResult.error.errors);
         return res.status(411).json({
             message : "Add a feild"
         })
     }
+    const validatedData = parseResult.data;
     //add frontend pass for goalId
     try{
-        await Goal.updateOne({ _id: req.body.goalId }, req.body)
+        const result =  await Goal.updateOne({ _id: validatedData.goalId }, validatedData)
+        if(result.nModified === 0){
+            console.log("No documents were modified.");
+            return res.status(400).json({
+                message: "Goal update failed. No changes were made."
+            });
+        }
+        console.log("Goal updated successfully:", result);
         res.status(201).json({
             message: "Goal updated successfully",
             })

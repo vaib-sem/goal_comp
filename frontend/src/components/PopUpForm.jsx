@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react'
+import axios from 'axios';
+import GoalWithId from './recoil';
+import { useRecoilState } from 'recoil';
 
 const PopupForm = ({ onClose,id }) => {
+    const [goalState,setgoalState] = useRecoilState(GoalWithId(id));
     const [formData, setFormData] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const token = localStorage.getItem('token');
     useEffect(() => {
         if (isSubmitting) {
-            formData.goalId = id;
-            axios.post('http://localhost:3000/api/v1/goal/updategoal', formData)
+            formData.goalId = id.id;
+            console.log(formData)
+            axios.post('http://localhost:3000/api/v1/goal/updategoal', formData,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }})
             .then((res) => {
                 let text = res.data.message;
                 if (text === 'Add a feild') {
@@ -16,6 +26,17 @@ const PopupForm = ({ onClose,id }) => {
                 } else if (text === 'Problem in updating goal') {
                     alert('Problem in updating goal');
                 } else if (text === 'Goal updated successfully') {
+                    const updatedGoalState = { ...goalState };
+                    if (formData.goalName) {
+                        updatedGoalState.goalName = formData.goalName;
+                    }
+                    if (formData.goalDescription) {
+                        updatedGoalState.goalDescription = formData.goalDescription;
+                    }
+                    if (formData.goalEnd) {
+                        updatedGoalState.goalEnd = formData.goalEnd;
+                    }
+                    setgoalState(updatedGoalState);
                     onClose();
                 }
             
@@ -49,11 +70,11 @@ const PopupForm = ({ onClose,id }) => {
                 <form onSubmit={handleSubmit}>
                     {/* Add your form fields here */}
                     <p className=' pb-1 text-sm text-center text-[#b6b7c4]'>GOAL NAME</p>
-                    <input onChange={HandleInput} type="text" placeholder="Workout" name='GoalName' className='w-full h-[1.6rem] rounded-lg px-1 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'/>
+                    <input onChange={HandleInput} type="text" placeholder="Workout" name='goalName' className='w-full h-[1.6rem] rounded-lg px-1 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'/>
                     <p className='pt-2 pb-1 text-sm text-center text-[#b6b7c4]'>GOAL DESCRIPTION</p>
-                    <input onChange={HandleInput} type="email" placeholder="Workout every day 💪" name = 'GoalDescription' className='w-full h-[1.6rem] rounded-lg px-1 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'/>
+                    <input onChange={HandleInput} type="text" placeholder="Workout every day 💪" name = 'goalDescription' className='w-full h-[1.6rem] rounded-lg px-1 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'/>
                     <p className='pt-2 pb-1 text-sm text-center text-[#b6b7c4]'>GOAL END DATE</p>
-                    <input onChange={HandleInput} type="date" name='End Date'  className='w-full h-[1.6rem] rounded-lg px-1 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'/>
+                    <input onChange={HandleInput} type="date" name='goalEnd'  className='w-full h-[1.6rem] rounded-lg px-1 text-white text-sm bg-[#5c5e7b] border-[#4A4D6D] border-2'/>
                 <button className=' w-full  rounded-xl h-[1.8rem] mt-5 bg-[#DBF4A7] hover:bg-[#C5DB96] text-center font-semibold text-lg text-[#4A4D6D] '>Submit</button>
                 <button onClick={onClose} className='w-full rounded-2xl h-[1.8rem]  mt-2 text-center text-sm font-light bg-[#5c5e7b] hover:bg-[#424562] text-white'>Cancel</button>
                 </form>

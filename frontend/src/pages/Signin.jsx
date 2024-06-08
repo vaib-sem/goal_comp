@@ -29,7 +29,7 @@ const Signin = () => {
                 } else if( text === 'Internal server error'){
                   alert('Internal server error')
                 }else if (text === 'User Successfully Logged In') {
-
+                  alert('User Successfully Logged In')
                   localStorage.setItem("token", res.data.token)
                   navigate("/dashboard")
                 
