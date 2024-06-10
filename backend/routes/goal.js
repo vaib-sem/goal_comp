@@ -211,17 +211,20 @@ const addfriendbody = zod.object({
     user_friendId : zod.string()
 
 })
-router.post('/Addfriend',authMiddleware,async(req,res) => {
-    const {success} = addfriendbody.safeParse(req.body)
-    if(!success){
-         return res.status(411).json({
-            message : "Unable to add a friend 1"
-        })
+router.post('/Addfriend', authMiddleware, async (req, res) => {
+    const { success } = addfriendbody.safeParse(req.body);
+    if (!success) {
+        return res.status(411).json({
+            message: "Unable to add a friend "
+        });
     }
-    // procedure is add the goal to the friends goal list 
-    const friend_add  = await User.findOne({_id : req.body.user_friendId})
-    const goal_add = await Goal.findOne({_id : req.body.goalId})
-     try{ 
+
+    
+    const friend_add = await User.findOne({ _id: req.body.user_friendId });
+    const goal_add = await Goal.findOne({ _id: req.body.goalId });
+
+    console.log("Before update:", friend_add);
+    try {
         if (!friend_add) {
             return res.status(404).json({
                 message: "Friend not found"
@@ -233,33 +236,46 @@ router.post('/Addfriend',authMiddleware,async(req,res) => {
                 message: "Goal not found"
             });
         }
-        if (!friend_add.goal_list_id) {
+        
+        if (!Array.isArray(friend_add.goal_list_id)) {
             friend_add.goal_list_id = [];
         }
-        // add goal id in the goal list of the friend as the goal id will be added when creating the goal for the creator
-        console.log("Before update:", friend_add);
+
         friend_add.goal_list_id.push(req.body.goalId);
-        console.log("After update:", friend_add);
-        // add friend id in the goal schema as the user parameter will already set for the user that created the goal 
+
+        if (!Array.isArray(goal_add.friends_id)) {
+            goal_add.friends_id = [];
+        }
+        
         goal_add.friends_id.push(req.body.user_friendId);
 
         goal_add.datecompleted.push({
-            id : req.body.user_friendId,
-            completed_days : 0
-        })
+            id: req.body.user_friendId,
+            completed_days: 0
+        });
 
-        await friend_add.save();
-        await goal_add.save();
-        return res.status(201).json({
-            message: "friend added successfully",
-        })
-    }catch(error){
+        console.log("After update:", goal_add);
+
+        try {
+            await friend_add.save();
+            await goal_add.save();
+            return res.status(201).json({
+                message: "friend added successfully",
+            });
+        } catch (error) {
+            return res.status(411).json({
+                message: "Unable to add a goal",
+                error: error.message
+            });
+        }
+
+    } catch (error) {
         return res.status(411).json({
-            message : "Unable to add a friend",
-            error : error.message
-        })
+            message: "Unable to add a friend",
+            error: error.message
+        });
     }
-})
+});
 
 const deletefriendbody = zod.object({
     goalId : zod.string(),

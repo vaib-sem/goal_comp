@@ -74,21 +74,17 @@ const goalSchema = new mongoose.Schema({
     },
     goalEnd : {
         type : Date,
-        required : false,
+        required : true,
         trim : true,
-        default : 'Present'
     },
     datecompleted:[datecompleteSchema],
     
     friends_id : [{
-        type : Array,
+        type : String, 
         required : true,
         default : [],
-    }],
-    last_completed : [{
-        type : Date,
-        required : false
     }]
+    
 
 })
 

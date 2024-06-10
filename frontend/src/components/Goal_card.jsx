@@ -9,7 +9,7 @@ import {
   } from 'recoil';
 import Table from "./Table";
 import PopupForm from "./PopUpForm";
-
+import Addfriend from "./Addfriend";
 //define state and update the element on the basis of the chage in props
 //props would be 
 
@@ -118,6 +118,37 @@ const GoalCard = (id) => {
         </div>
         );
     }
+    const Addfriendbutton = () => {
+        const [showPopup, setShowPopup] = useState(false);
+
+        const handleUpdateButtonClick = () => {
+            setShowPopup(true);
+          };
+        
+          const handleClosePopup = () => {
+            setShowPopup(false);
+          };
+        return (
+            <div>
+            <button
+                onClick={handleUpdateButtonClick} disabled = {showPopup} 
+                className="bg-[#426B69] rounded-lg mb-4 flex-1 mx-6 drop-shadow-lg">
+
+                <p className=" text-xs p-3  min-h-6 text-center font-light text-[#E4ECD5]">ADD FRIEND</p>
+            </button>
+            {showPopup && 
+            (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="absolute rounded-2xl  inset-0 bg-black opacity-50"></div>
+                <div className=" z-20 w-2/3 h-1/2 bg-[#5c5e7b] pt-1 rounded-lg shadow-lg">
+              <Addfriend onClose={handleClosePopup} id = {id} />
+            </div>
+          </div>
+             
+        )}
+        </div>
+        );
+    }
 
     return( 
     
@@ -156,6 +187,7 @@ const GoalCard = (id) => {
                     </div>
                     <div className="flex justify-center mb-2">
                         <PopupButton></PopupButton> 
+                        <Addfriendbutton></Addfriendbutton>
                     </div>
                 </div>
                 

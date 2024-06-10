@@ -7,12 +7,15 @@ import PropTypes from 'prop-types';
 const Table = (friends) => {
 const [sortedFriends, setSortedFriends] = useState([]);
 const [names, setNames] = useState([]);
-let data = friends.friends;
+
 useEffect(() => {
-    const sorted = data.sort((a, b) =>  {
-        return b.completed_days - a.completed_days
-    });
-        setSortedFriends(sorted);
+    let data = friends.friends;
+    console.log("Friends Data: ", data);
+    const sorted = [...data].sort((a, b) => b.completed_days - a.completed_days);
+    console.log("Sorted Date Completed Array: ", sorted);
+
+    
+    setSortedFriends(sorted);
     const userIds = sorted.map(user => user.id);
 
     const fetchNames = async () => {

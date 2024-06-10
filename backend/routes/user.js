@@ -151,30 +151,27 @@ router.put('/updateuser', authMiddleware , async (req,res) => {
 })
 
 router.get('/bulk', async (req,res) =>{
-    const name = req.query || '';
+    const { name } = req.query;
+    const regex = new RegExp(name, 'i');
+    try {
+        const users = await User.find({
+            $or: [
+                { firstName: { $regex: regex } },
+                { lastName: { $regex: regex } }
+            ]
+        });
 
-    const users = await User.find({
-        $or : [{
-            firstName : {
-                "$regex" : name
-            }
-        },{
-            lastName : {
-                "$regex" : name
-            }
-        }]
-    })
-
-    res.json({
-        user : users.map(user =>({
-            username : user.username,
-            firstName : user.firstName,
-            lastName : user.lastName,
-            _id : user._id
-
-        }))
-    })
-
+        res.json({
+            users: users.map(user => ({
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                _id: user._id
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users', error: error.message });
+    }
 })
 
 router.post('/names',async(req,res)=>{
